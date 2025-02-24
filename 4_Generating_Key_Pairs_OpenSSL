@@ -1,12 +1,12 @@
 Generating RSA keypair
 --------------------------
 
-# Generate RSA keys of various sizes
+# Generate RSA keys of various sizes (OpenSSL, TLS/SSL, Linux, .pem, .crt, .key, Base64 (Text))
 openssl genrsa
 openssl genrsa 1024
 openssl genrsa 4096
 
-# Generate RSA private and store it to a file.
+# Generate RSA private and store it to a file. (Same but different permissions of the file key, -out will make it 600 as it should be (accesable only the user)
 openssl genrsa -out key.pri
 openssl genrsa > key.pri
 
@@ -21,21 +21,24 @@ openssl rsa -in key.pri -noout -text
 # Examine RSA public key
 openssl rsa -in key.pub -pubin -noout -text 
 
-# Converting PEM formatted keys to DER
+# Converting PEM formatted keys to DER (Used in Java-based applications, Windows certificate stores, Cryptographic hardware (smart cards), less with certificates and TLS, Binary) 
 openssl rsa -in key.pri -out key.pri.der -outform DER
 
-# examining DER formatted private key
+# Examining DER formatted private key
 openssl rsa -in key.pri.der -inform DER -noout -text
 
-# Generating encrypted private key file.
+#### Generating RSA private key, encrypting it with AES-256-CBC. (Best practice without exposing the key contents while creating it, encrypted data in base64 format) 
 openssl genrsa -aes-256-cbc -out rsa.pri 2048
 
+Decrypt the Private Key (Remove Encryption) 
+openssl rsa -in rsa.pri -out rsa_unencrypted.pri
 
 
-Generate DSA keys
+
+Generate DSA keys (Deprecated) 
 ------------------
 
-# Generate DSA parameter file
+# Generate DSA parameter file to generate a private key 
 openssl dsaparam -out dsa.param 2048
 
 # Generate DSA keypair
@@ -57,16 +60,16 @@ openssl gendsa -des-ede3-cbc -out dsa.pri dsa.param
 Generate ECDSA keys
 ---------------------
 
-# Get the list of all supported curves
+# Get the list of all supported curves and pick one
 openssl ecparam -list_curves
 
 # Generate ecparam files
 openssl ecparam -name sect571r1 -out ecdsa.param
 
-# Generate ecdsa private key
+# Generate ecdsa private key (-noout is required instead of just -out because othewise the parameter will be included along with the private key in the same file instead of just using the param to create the private key) 
 openssl ecparam -genkey -in ecdsa.param -noout -out ecdsa.pri
 
-# Generate ecdsa private key without using param files.
+# Generate ecdsa private key without using param files. (instead of creating the param file separately we do everything in a single command) 
 openssl ecparam -genkey -name sect571r1 -noout -out ecdsa.pri
 
 # Generating ecdsa public key
@@ -85,10 +88,10 @@ openssl ecparam -name sect571r1 -genkey | openssl ec -aes-256-cbc -out ecdsa.pri
 
 
 
-Alternate ways to generate private keys
+Alternate ways to generate private keys (genpkey can also be used to generate private keys for an algorithm for which openssl does not have specific command (like rsa,ec...) - e.g: no command to generate advert-curve keys in openssl) for that we'll use genpkey)) 
 -----------------------------------------
 
-# Generate RSA key
+# Generate RSA key (pkcs8 (no information in cat about the algorithm) 
 openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -pkeyopt rsa_keygen_pubexp:17 -out rsa.pri
 
 # Examining RSA private key
