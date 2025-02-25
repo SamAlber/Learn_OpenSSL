@@ -1,4 +1,3 @@
-
 # Simple RSA Sign/Verify
 openssl rsautl -sign -inkey rsa.pri -in jack_and_gill.txt -out jack_and_gill.sig
 openssl rsautl -verify -inkey rsa.pub -pubin -in jack_and_gill.sig
